@@ -41,22 +41,38 @@ export default function Navbar() {
   };
 
   const user = sessionData?.user;
+  const userRole = (user as any)?.role || "Job Seeker";
 
+  // Logged out: minimum 3 routes (rubric requirement)
   const publicLinks = [
     { label: "Home", href: "/" },
     { label: "Browse Jobs", href: "/jobs" },
     { label: "About", href: "/about" },
   ];
 
-  const privateLinks = [
+  // Logged in as Employer: 5 routes (rubric requirement)
+  const employerLinks = [
     { label: "Home", href: "/" },
     { label: "Browse Jobs", href: "/jobs" },
-    { label: "Post a Job", href: "/jobs/add" },
-    { label: "Manage Jobs", href: "/jobs/manage" },
+    { label: "Post a Job", href: "/dashboard/jobs/add" },
+    { label: "Manage Jobs", href: "/dashboard/jobs/manage" },
     { label: "Dashboard", href: "/dashboard" },
   ];
 
-  const links = user ? privateLinks : publicLinks;
+  // Logged in as Job Seeker: 5 routes (rubric requirement)
+  const jobSeekerLinks = [
+    { label: "Home", href: "/" },
+    { label: "Browse Jobs", href: "/jobs" },
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "About", href: "/about" },
+    { label: "Contact", href: "/contact" },
+  ];
+
+  const links = !user
+    ? publicLinks
+    : userRole === "Employer"
+      ? employerLinks
+      : jobSeekerLinks;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
@@ -78,11 +94,10 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 font-semibold"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  }`}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
+                    ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 font-semibold"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    }`}
                 >
                   {link.label}
                 </Link>
@@ -117,14 +132,14 @@ export default function Navbar() {
               /* User Dropdown */
               <Dropdown>
                 <Dropdown.Trigger>
-                  <button className="flex items-center cursor-pointer focus:outline-none ring-2 ring-indigo-500 rounded-full">
+                  <div className="flex items-center cursor-pointer focus:outline-none ring-2 ring-indigo-500 rounded-full">
                     <Avatar className="w-8 h-8 rounded-full">
                       {user.image && <Avatar.Image src={user.image} alt={user.name || "User"} />}
                       <Avatar.Fallback className="bg-indigo-600 text-white text-xs font-bold flex items-center justify-center w-full h-full rounded-full">
                         {(user.name || "U").charAt(0).toUpperCase()}
                       </Avatar.Fallback>
                     </Avatar>
-                  </button>
+                  </div>
                 </Dropdown.Trigger>
                 <Dropdown.Popover>
                   <Dropdown.Menu aria-label="User Actions">
@@ -133,7 +148,7 @@ export default function Navbar() {
                         <span className="text-xs text-gray-500">Signed in as</span>
                         <span className="text-sm font-bold text-foreground truncate max-w-[180px]">{user.email}</span>
                         <span className="text-xs text-indigo-500 font-medium">
-                          {(user as any).role || "Job Seeker"}
+                          {userRole}
                         </span>
                       </div>
                     </Dropdown.Item>
@@ -202,11 +217,10 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`block px-4 py-2.5 rounded-lg text-base font-medium transition-colors ${
-                  isActive
-                    ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 font-bold"
-                    : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
-                }`}
+                className={`block px-4 py-2.5 rounded-lg text-base font-medium transition-colors ${isActive
+                  ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 font-bold"
+                  : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                  }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.label}
