@@ -9,6 +9,9 @@ import {
   FaFileAlt,
   FaChevronRight,
 } from "react-icons/fa";
+import LatestJobs from "@/components/LatestJobs";
+import LatestReviews from "@/components/LatestRivews";
+import LatestApplications from "@/components/LatestApplication";
 
 export default function Home() {
   return (
@@ -115,6 +118,11 @@ export default function Home() {
               </p>
             </Card.Content>
           </Card>
+
+          <div>
+
+
+          </div>
         </div>
       </section>
 

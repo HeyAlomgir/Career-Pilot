@@ -14,7 +14,6 @@ import {
 import { FiSun, FiMoon, FiLogOut, FiSettings, FiMenu, FiX } from "react-icons/fi";
 
 export default function Navbar() {
-  // সব hook এখানে unconditionally কল করা হয়েছে - কোনো if/return এর আগে না
   const pathname = usePathname();
   const router = useRouter();
   const { setTheme, resolvedTheme } = useTheme();
@@ -43,6 +42,9 @@ export default function Navbar() {
   const user = sessionData?.user;
   const userRole = (user as any)?.role || "Job Seeker";
 
+  // Employer আর Job Seeker এর জন্য আলাদা dashboard route
+  const dashboardHref = userRole === "Employer" ? "/dashboard" : "/dashboard/seeker";
+
   const publicLinks = [
     { label: "Home", href: "/" },
     { label: "Browse Jobs", href: "/jobs" },
@@ -54,13 +56,13 @@ export default function Navbar() {
     { label: "Browse Jobs", href: "/jobs" },
     { label: "Post a Job", href: "/dashboard/jobs/add" },
     { label: "Manage Jobs", href: "/dashboard/jobs/manage" },
-    { label: "Dashboard", href: "/dashboard" },
+    { label: "Dashboard", href: dashboardHref },
   ];
 
   const jobSeekerLinks = [
     { label: "Home", href: "/" },
     { label: "Browse Jobs", href: "/jobs" },
-    { label: "Dashboard", href: "/dashboard" },
+    { label: "Dashboard", href: dashboardHref },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ];
@@ -92,8 +94,8 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                    ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 font-semibold"
-                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 font-semibold"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
                     }`}
                 >
                   {link.label}
@@ -152,7 +154,7 @@ export default function Navbar() {
                     <Dropdown.Item
                       id="dashboard"
                       textValue="Dashboard"
-                      onAction={() => router.push("/dashboard")}
+                      onAction={() => router.push(dashboardHref)}
                     >
                       <span className="flex items-center gap-2">
                         <FiSettings className="text-gray-500" />
@@ -215,8 +217,8 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={`block px-4 py-2.5 rounded-lg text-base font-medium transition-colors ${isActive
-                  ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 font-bold"
-                  : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                    ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 font-bold"
+                    : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
                   }`}
                 onClick={() => setIsMenuOpen(false)}
               >
