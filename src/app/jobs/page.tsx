@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { FiSearch, FiMapPin, FiBriefcase, FiImage } from "react-icons/fi";
+import { FiSearch, FiMapPin, FiBriefcase, FiBriefcase as FiBuilding } from "react-icons/fi";
 
 interface Job {
     _id: string;
@@ -22,7 +22,6 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:500
 
 const filterInputClass =
     "bg-transparent outline-none w-full text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500";
-// এখন w-full এবং md:w-auto যোগ করা হয়েছে - মোবাইলে ফুল উইথ, ডেস্কটপে auto
 const selectClass =
     "w-full md:w-auto px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-sm outline-none";
 
@@ -81,7 +80,7 @@ export default function JobsPage(): React.JSX.Element {
                 <p className="text-gray-500 dark:text-gray-400 mt-1">{total} opportunities waiting for you</p>
             </div>
 
-            {/* Search + Filter Bar - মোবাইলে সব ফুল উইথ স্ট্যাক হবে */}
+            {/* Search + Filter Bar */}
             <form
                 onSubmit={handleSearchSubmit}
                 className="flex flex-col md:flex-row md:flex-wrap gap-3 mb-8 bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-2xl p-4"
@@ -153,11 +152,15 @@ export default function JobsPage(): React.JSX.Element {
                     {Array.from({ length: 8 }).map((_, i) => (
                         <div
                             key={i}
-                            className="rounded-2xl border border-gray-200 dark:border-gray-800 p-5 h-64 animate-pulse bg-gray-100 dark:bg-gray-900"
+                            className="rounded-2xl border border-gray-200 dark:border-gray-800 p-5 h-56 animate-pulse bg-gray-100 dark:bg-gray-900"
                         >
-                            <div className="h-5 w-3/4 bg-gray-300 dark:bg-gray-700 rounded mb-3" />
-                            <div className="h-3 w-1/2 bg-gray-300 dark:bg-gray-700 rounded mb-6" />
-                            <div className="h-3 w-full bg-gray-300 dark:bg-gray-700 rounded mb-2" />
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-14 h-14 rounded-full bg-gray-300 dark:bg-gray-700 flex-shrink-0" />
+                                <div className="flex-1">
+                                    <div className="h-4 w-3/4 bg-gray-300 dark:bg-gray-700 rounded mb-2" />
+                                    <div className="h-3 w-1/2 bg-gray-300 dark:bg-gray-700 rounded" />
+                                </div>
+                            </div>
                             <div className="h-3 w-full bg-gray-300 dark:bg-gray-700 rounded mb-2" />
                             <div className="h-3 w-2/3 bg-gray-300 dark:bg-gray-700 rounded" />
                         </div>
@@ -172,45 +175,51 @@ export default function JobsPage(): React.JSX.Element {
                     {jobs.map((job) => (
                         <div
                             key={job._id}
-                            className="flex flex-col justify-between rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-700 transition-all overflow-hidden"
+                            className="flex flex-col justify-between h-56 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-700 transition-all p-5"
                         >
-                            {/* Job Image / Company Logo */}
-                            <div className="w-full h-28 bg-gray-100 dark:bg-gray-900 flex items-center justify-center overflow-hidden">
-                                {job.imageUrl ? (
-                                    <img src={job.imageUrl} alt={job.company} className="w-full h-full object-cover" />
-                                ) : (
-                                    <FiImage className="text-gray-300 dark:text-gray-700" size={28} />
-                                )}
-                            </div>
+                            <div>
+                                {/* Avatar (left) + Title/Company (right) - পাশাপাশি */}
+                                <div className="flex items-start gap-3 mb-3">
+                                    {/* Avatar - গোল আকৃতির ছোট ছবি */}
+                                    <div className="w-14 h-14 flex-shrink-0 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex items-center justify-center">
+                                        {job.imageUrl ? (
+                                            <img src={job.imageUrl} alt={job.company} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <FiBuilding className="text-gray-300 dark:text-gray-700" size={20} />
+                                        )}
+                                    </div>
 
-                            <div className="p-5 flex flex-col justify-between flex-1">
-                                <div>
-                                    <span className="inline-block px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 rounded-full mb-2">
-                                        {job.category}
-                                    </span>
-                                    <h3 className="font-bold text-gray-900 dark:text-white line-clamp-1">{job.title}</h3>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{job.company}</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{job.description}</p>
+                                    {/* Title + Company (ছবির পাশে) */}
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="font-bold text-gray-900 dark:text-white line-clamp-1">{job.title}</h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">{job.company}</p>
+                                        <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 rounded-full">
+                                            {job.category}
+                                        </span>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mb-3 mt-2">
-                                        <span className="flex items-center gap-1">
-                                            <FiMapPin size={12} /> {job.location}
-                                        </span>
-                                        <span className="flex items-center gap-1">
-                                            <FiBriefcase size={12} /> {job.jobType}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">{job.salary}</span>
-                                        <Link
-                                            href={`/jobs/${job._id}`}
-                                            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-black hover:opacity-90 transition-opacity"
-                                        >
-                                            View Details
-                                        </Link>
-                                    </div>
+                                {/* Description নিচে, পুরো width জুড়ে */}
+                                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{job.description}</p>
+                            </div>
+
+                            <div>
+                                <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mb-3 mt-2">
+                                    <span className="flex items-center gap-1">
+                                        <FiMapPin size={12} /> {job.location}
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <FiBriefcase size={12} /> {job.jobType}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">{job.salary}</span>
+                                    <Link
+                                        href={`/jobs/${job._id}`}
+                                        className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-black hover:opacity-90 transition-opacity"
+                                    >
+                                        View Details
+                                    </Link>
                                 </div>
                             </div>
                         </div>
