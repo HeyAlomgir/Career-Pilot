@@ -177,6 +177,13 @@ export default function ManageJobsPage(): React.JSX.Element {
                                                 >
                                                     <FiEye size={16} />
                                                 </Link>
+                                                <Link
+                                                    href={`/dashboard/jobs/${job._id}/applicants`}
+                                                    className="px-2 py-1 rounded-lg text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition-colors"
+                                                    title="View Applicants"
+                                                >
+                                                    Applicants
+                                                </Link>
                                                 <button
                                                     onClick={() => handleDelete(job._id, job.title)}
                                                     disabled={deletingId === job._id}
@@ -213,6 +220,15 @@ export default function ManageJobsPage(): React.JSX.Element {
                                     >
                                         <FiEye size={14} /> View
                                     </Link>
+
+                                    <Link
+                                        href={`/dashboard/jobs/${job._id}/applicants`}
+                                        className="px-2 py-1 rounded-lg text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition-colors"
+                                        title="View Applicants"
+                                    >
+                                        Applicants
+                                    </Link>
+
                                     <button
                                         onClick={() => handleDelete(job._id, job.title)}
                                         disabled={deletingId === job._id}
