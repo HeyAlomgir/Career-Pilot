@@ -14,6 +14,7 @@ import {
 import { FiSun, FiMoon, FiLogOut, FiSettings, FiMenu, FiX } from "react-icons/fi";
 
 export default function Navbar() {
+  // সব hook এখানে unconditionally কল করা হয়েছে - কোনো if/return এর আগে না
   const pathname = usePathname();
   const router = useRouter();
   const { setTheme, resolvedTheme } = useTheme();
@@ -25,7 +26,6 @@ export default function Navbar() {
     setMounted(true);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setIsMenuOpen(false);
   }, [pathname]);
@@ -43,14 +43,12 @@ export default function Navbar() {
   const user = sessionData?.user;
   const userRole = (user as any)?.role || "Job Seeker";
 
-  // Logged out: minimum 3 routes (rubric requirement)
   const publicLinks = [
     { label: "Home", href: "/" },
     { label: "Browse Jobs", href: "/jobs" },
     { label: "About", href: "/about" },
   ];
 
-  // Logged in as Employer: 5 routes (rubric requirement)
   const employerLinks = [
     { label: "Home", href: "/" },
     { label: "Browse Jobs", href: "/jobs" },
@@ -59,7 +57,6 @@ export default function Navbar() {
     { label: "Dashboard", href: "/dashboard" },
   ];
 
-  // Logged in as Job Seeker: 5 routes (rubric requirement)
   const jobSeekerLinks = [
     { label: "Home", href: "/" },
     { label: "Browse Jobs", href: "/jobs" },
@@ -95,8 +92,8 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                    ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 font-semibold"
-                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 font-semibold"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
                     }`}
                 >
                   {link.label}
@@ -218,8 +215,8 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={`block px-4 py-2.5 rounded-lg text-base font-medium transition-colors ${isActive
-                  ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 font-bold"
-                  : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                    ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 font-bold"
+                    : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
                   }`}
                 onClick={() => setIsMenuOpen(false)}
               >
