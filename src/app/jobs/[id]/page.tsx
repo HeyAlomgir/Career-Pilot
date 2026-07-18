@@ -10,9 +10,11 @@ import {
     FiBriefcase,
     FiDollarSign,
     FiCalendar,
-    FiImage,
+    FiBriefcase as FiBuilding,
     FiArrowLeft,
     FiX,
+    FiBookmark,
+    FiStar,
 } from "react-icons/fi";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
@@ -32,6 +34,14 @@ interface Job {
     createdAt: string;
 }
 
+interface Review {
+    _id: string;
+    userName: string;
+    rating: number;
+    comment: string;
+    createdAt: string;
+}
+
 export default function JobDetailsPage(): React.JSX.Element {
     const params = useParams();
     const router = useRouter();
@@ -42,10 +52,21 @@ export default function JobDetailsPage(): React.JSX.Element {
 
     const [job, setJob] = useState<Job | null>(null);
     const [loading, setLoading] = useState(true);
+
     const [showApplyModal, setShowApplyModal] = useState(false);
     const [coverLetter, setCoverLetter] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
+    const [isBookmarked, setIsBookmarked] = useState(false);
+    const [bookmarkLoading, setBookmarkLoading] = useState(false);
+
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [avgRating, setAvgRating] = useState(0);
+    const [reviewRating, setReviewRating] = useState(5);
+    const [reviewComment, setReviewComment] = useState("");
+    const [submittingReview, setSubmittingReview] = useState(false);
+
+    // Job details fetch
     useEffect(() => {
         const fetchJob = async () => {
             setLoading(true);
@@ -67,6 +88,64 @@ export default function JobDetailsPage(): React.JSX.Element {
 
         if (jobId) fetchJob();
     }, [jobId]);
+
+    // Bookmark status fetch
+    useEffect(() => {
+        const fetchBookmarkStatus = async () => {
+            if (!user || !jobId) return;
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/bookmarks/${jobId}`, {
+                    headers: { "x-user-id": user.id },
+                });
+                const data = await res.json();
+                setIsBookmarked(data.bookmarked || false);
+            } catch (err) {
+                console.error("Error fetching bookmark status:", err);
+            }
+        };
+
+        fetchBookmarkStatus();
+    }, [user, jobId]);
+
+    // Reviews fetch
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/reviews/${jobId}`);
+                const data = await res.json();
+                setReviews(data.reviews || []);
+                setAvgRating(data.avgRating || 0);
+            } catch (err) {
+                console.error("Error fetching reviews:", err);
+            }
+        };
+
+        if (jobId) fetchReviews();
+    }, [jobId]);
+
+    const handleToggleBookmark = async () => {
+        if (!user) {
+            toast.error("Please sign in to bookmark jobs.");
+            router.push("/signin");
+            return;
+        }
+
+        setBookmarkLoading(true);
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/bookmarks/${jobId}`, {
+                method: "POST",
+                headers: { "x-user-id": user.id },
+            });
+            const data = await res.json();
+            setIsBookmarked(data.bookmarked);
+            toast.success(data.bookmarked ? "Job bookmarked!" : "Bookmark removed");
+        } catch (err) {
+            console.error("Error toggling bookmark:", err);
+            toast.error("Something went wrong.");
+        } finally {
+            setBookmarkLoading(false);
+        }
+    };
 
     const handleApplySubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -120,15 +199,65 @@ export default function JobDetailsPage(): React.JSX.Element {
         }
     };
 
+    const handleReviewSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!user) {
+            toast.error("Please sign in to leave a review.");
+            router.push("/signin");
+            return;
+        }
+
+        if (!reviewComment.trim()) {
+            toast.error("Please write a comment.");
+            return;
+        }
+
+        setSubmittingReview(true);
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/reviews/${jobId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-user-id": user.id,
+                },
+                body: JSON.stringify({
+                    userName: user.name || "Anonymous",
+                    rating: reviewRating,
+                    comment: reviewComment,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                toast.error(data.message || "Failed to submit review.");
+                return;
+            }
+
+            toast.success("Review submitted!");
+            setReviewComment("");
+            setReviewRating(5);
+
+            // reviews আবার fetch করে নিলাম, নতুন review সহ list refresh হবে
+            const refreshed = await fetch(`${BACKEND_URL}/api/reviews/${jobId}`);
+            const refreshedData = await refreshed.json();
+            setReviews(refreshedData.reviews || []);
+            setAvgRating(refreshedData.avgRating || 0);
+        } catch (err) {
+            console.error("Error submitting review:", err);
+            toast.error("Something went wrong.");
+        } finally {
+            setSubmittingReview(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen pt-24 px-4 max-w-4xl mx-auto animate-pulse">
                 <div className="h-8 w-1/2 bg-gray-200 dark:bg-gray-800 rounded mb-4" />
                 <div className="h-4 w-1/3 bg-gray-200 dark:bg-gray-800 rounded mb-8" />
                 <div className="h-40 w-full bg-gray-200 dark:bg-gray-800 rounded-2xl mb-6" />
-                <div className="h-4 w-full bg-gray-200 dark:bg-gray-800 rounded mb-2" />
-                <div className="h-4 w-full bg-gray-200 dark:bg-gray-800 rounded mb-2" />
-                <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-800 rounded" />
             </div>
         );
     }
@@ -157,15 +286,31 @@ export default function JobDetailsPage(): React.JSX.Element {
 
             {/* Header card */}
             <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden mb-6">
-                <div className="w-full h-40 bg-gray-100 dark:bg-gray-900 flex items-center justify-center p-4">
-                    {job.imageUrl ? (
-                        <img src={job.imageUrl} alt={job.company} className="max-w-full max-h-full object-contain" />
-                    ) : (
-                        <FiImage className="text-gray-300 dark:text-gray-700" size={40} />
-                    )}
+
+                {/* Top row: Avatar (left) + Bookmark icon (right) */}
+                <div className="flex items-start justify-between p-6 pb-0">
+                    <div className="w-16 h-16 flex-shrink-0 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex items-center justify-center">
+                        {job.imageUrl ? (
+                            <img src={job.imageUrl} alt={job.company} className="w-full h-full object-cover" />
+                        ) : (
+                            <FiBuilding className="text-gray-300 dark:text-gray-700" size={24} />
+                        )}
+                    </div>
+
+                    <button
+                        onClick={handleToggleBookmark}
+                        disabled={bookmarkLoading}
+                        className={`p-2.5 rounded-full border transition-colors ${isBookmarked
+                            ? "bg-indigo-600 border-indigo-600 text-white"
+                            : "border-gray-200 dark:border-gray-700 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                            }`}
+                        title={isBookmarked ? "Remove bookmark" : "Bookmark this job"}
+                    >
+                        <FiBookmark size={18} fill={isBookmarked ? "currentColor" : "none"} />
+                    </button>
                 </div>
 
-                <div className="p-6">
+                <div className="p-6 pt-4">
                     <span className="inline-block px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 rounded-full mb-3">
                         {job.category}
                     </span>
@@ -205,7 +350,7 @@ export default function JobDetailsPage(): React.JSX.Element {
                         </div>
                     </div>
 
-                    {/* Apply button - শুধু Job Seeker দের জন্য দেখাবে */}
+                    {/* Apply button - শুধু Job Seeker দের জন্য */}
                     {userRole !== "Employer" && (
                         <button
                             onClick={() => setShowApplyModal(true)}
@@ -218,11 +363,89 @@ export default function JobDetailsPage(): React.JSX.Element {
             </div>
 
             {/* Description / Overview */}
-            <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-6">
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-6 mb-6">
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Job Description</h2>
                 <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line">
                     {job.description}
                 </p>
+            </div>
+
+            {/* Reviews Section */}
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-6">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white">Reviews</h2>
+                    {reviews.length > 0 && (
+                        <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                            <FiStar className="text-yellow-500" fill="currentColor" size={14} />
+                            <span className="font-semibold text-gray-900 dark:text-white">{avgRating.toFixed(1)}</span>
+                            <span>({reviews.length})</span>
+                        </div>
+                    )}
+                </div>
+
+                {/* Review list */}
+                {reviews.length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">No reviews yet. Be the first to leave one!</p>
+                ) : (
+                    <div className="flex flex-col gap-4 mb-6">
+                        {reviews.map((review) => (
+                            <div key={review._id} className="border-b border-gray-100 dark:border-gray-800 pb-4 last:border-0">
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="text-sm font-semibold text-gray-900 dark:text-white">{review.userName}</span>
+                                    <div className="flex items-center gap-0.5">
+                                        {Array.from({ length: 5 }).map((_, i) => (
+                                            <FiStar
+                                                key={i}
+                                                size={12}
+                                                className={i < review.rating ? "text-yellow-500" : "text-gray-300 dark:text-gray-700"}
+                                                fill={i < review.rating ? "currentColor" : "none"}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">{review.comment}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Add review form */}
+                <form onSubmit={handleReviewSubmit} className="border-t border-gray-100 dark:border-gray-800 pt-5">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">Leave a Review</p>
+
+                    <div className="flex items-center gap-1 mb-3">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                            <button
+                                type="button"
+                                key={i}
+                                onClick={() => setReviewRating(i + 1)}
+                                className="focus:outline-none"
+                            >
+                                <FiStar
+                                    size={20}
+                                    className={i < reviewRating ? "text-yellow-500" : "text-gray-300 dark:text-gray-700"}
+                                    fill={i < reviewRating ? "currentColor" : "none"}
+                                />
+                            </button>
+                        ))}
+                    </div>
+
+                    <textarea
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                        rows={3}
+                        placeholder="Share your experience..."
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm outline-none focus:ring-2 focus:ring-indigo-500 resize-none mb-3"
+                    />
+
+                    <button
+                        type="submit"
+                        disabled={submittingReview}
+                        className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-60"
+                    >
+                        {submittingReview ? "Submitting..." : "Submit Review"}
+                    </button>
+                </form>
             </div>
 
             {/* Apply Modal */}

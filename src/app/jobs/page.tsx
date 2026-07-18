@@ -72,7 +72,7 @@ export default function JobsPage(): React.JSX.Element {
     };
 
     return (
-        <div className="min-h-screen pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="min-h-screen pt-24 pb-16 px-4 sm:px-6 lg:px-8 container mx-auto">
 
             {/* Page Heading */}
             <div className="mb-8">
