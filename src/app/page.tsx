@@ -18,7 +18,7 @@ export default function Home() {
         {/* Background blur blob */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
 
-        <div className="max-w-4xl mx-auto flex flex-col items-center gap-6">
+        <div className="container mx-auto flex flex-col items-center gap-6">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-semibold tracking-wide border border-indigo-500/20">
             <FaRobot className="text-sm" />
@@ -118,13 +118,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="mt-auto border-t border-gray-200 dark:border-gray-800 py-8 bg-gray-50 dark:bg-gray-950 text-center">
-        <p className="text-xs text-gray-400">
-          &copy; {new Date().getFullYear()} CareerPilot. Built for course
-          assignment. All rights reserved.
-        </p>
-      </footer>
+
     </div>
   );
 }
