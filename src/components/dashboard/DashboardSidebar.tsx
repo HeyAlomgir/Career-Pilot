@@ -43,9 +43,9 @@ export default function DashboardSidebar(): React.JSX.Element {
             { icon: FiUser, label: "Profile", link: "/dashboard/profile" },
         ],
         "job seeker": [
-            { icon: FiGrid, label: "Overview", link: "/dashboard" },
-            { icon: FiSearch, label: "Browse Jobs", link: "/dashboard/jobs" },
-            { icon: FiFileText, label: "My Applications", link: "/dashboard/applications" },
+            { icon: FiGrid, label: "Overview", link: "/dashboard/seeker" },
+            { icon: FiSearch, label: "Browse Jobs", link: "/jobs" },
+            { icon: FiFileText, label: "My Applications", link: "/dashboard/seeker/applications" },
             { icon: FiUser, label: "Profile", link: "/dashboard/profile" },
         ],
     };
