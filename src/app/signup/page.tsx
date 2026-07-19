@@ -1,15 +1,32 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useSession, signUp } from "@/lib/auth-client";
-import { Card, Button, Spinner } from "@heroui/react";
-import { FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash, FaBriefcase, FaChevronDown } from "react-icons/fa";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useSession, signIn, signUp } from "@/lib/auth-client";
+import { Card, Button, Separator, Spinner } from "@heroui/react";
+import { FaGoogle, FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash, FaBriefcase, FaChevronDown } from "react-icons/fa";
 
 export default function SignUpPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex flex-1 items-center justify-center min-h-[75vh]">
+          <Spinner size="lg" />
+        </div>
+      }
+    >
+      <SignUpForm />
+    </Suspense>
+  );
+}
+
+function SignUpForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session, isPending: sessionLoading } = useSession();
+
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -20,23 +37,47 @@ export default function SignUpPage() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (session) router.push("/dashboard");
-  }, [session, router]);
+    if (session) router.push(redirectTo);
+  }, [session, router, redirectTo]);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email || !password || !role) { setError("Please fill in all fields."); return; }
+    if (!name || !email || !password || !role) {
+      setError("Please fill in all fields.");
+      return;
+    }
     setIsLoading(true);
     setError("");
     try {
-      await signUp.email({ email, password, name, role, callbackURL: "/dashboard" }, {
-        onError: (ctx) => { setError(ctx.error.message || "Failed to create an account."); setIsLoading(false); },
-        onSuccess: () => { router.push("/dashboard"); router.refresh(); },
-      });
+      await signUp.email(
+        { email, password, name, role, callbackURL: redirectTo },
+        {
+          onError: (ctx) => {
+            setError(ctx.error.message || "Failed to create an account.");
+            setIsLoading(false);
+          },
+          onSuccess: () => {
+            router.push(redirectTo);
+            router.refresh();
+          },
+        }
+      );
     } catch (err: any) {
       setError(err?.message || "An unexpected error occurred.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    setError("");
+    try {
+      // Google দিয়ে সাইনআপ করলেও এটাই ব্যবহার হয় (নতুন হলে account তৈরি, পুরনো হলে লগইন)
+      await signIn.social({ provider: "google", callbackURL: redirectTo });
+    } catch (err: any) {
+      setError(err?.message || "Google sign-in failed.");
       setIsLoading(false);
     }
   };
@@ -73,10 +114,15 @@ export default function SignUpPage() {
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"><FaUser /></span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">
+                  <FaUser />
+                </span>
                 <input
-                  required type="text" placeholder="Enter your full name"
-                  value={name} onChange={(e) => setName(e.target.value)}
+                  required
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                 />
               </div>
@@ -86,10 +132,15 @@ export default function SignUpPage() {
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Email Address</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"><FaEnvelope /></span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">
+                  <FaEnvelope />
+                </span>
                 <input
-                  required type="email" placeholder="Enter your email"
-                  value={email} onChange={(e) => setEmail(e.target.value)}
+                  required
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                 />
               </div>
@@ -99,13 +150,23 @@ export default function SignUpPage() {
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"><FaLock /></span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">
+                  <FaLock />
+                </span>
                 <input
-                  required type={isVisible ? "text" : "password"} placeholder="Create a password"
-                  value={password} onChange={(e) => setPassword(e.target.value)}
+                  required
+                  type={isVisible ? "text" : "password"}
+                  placeholder="Create a password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-9 pr-10 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                 />
-                <button type="button" onClick={toggleVisibility} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Toggle visibility">
+                <button
+                  type="button"
+                  onClick={toggleVisibility}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                  aria-label="Toggle visibility"
+                >
                   {isVisible ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
@@ -125,7 +186,9 @@ export default function SignUpPage() {
                   <option value="Job Seeker">Job Seeker — Browse &amp; Apply for Jobs</option>
                   <option value="Employer">Employer — Post &amp; Manage Job Openings</option>
                 </select>
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"><FaChevronDown /></span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs">
+                  <FaChevronDown />
+                </span>
               </div>
             </div>
 
@@ -137,6 +200,35 @@ export default function SignUpPage() {
               Create Account
             </Button>
           </form>
+
+          {/* Social Sign In */}
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2">
+              <Separator className="flex-1" />
+              <span className="text-xs text-gray-400 font-semibold uppercase">Or continue with</span>
+              <Separator className="flex-1" />
+            </div>
+            <Button
+              onPress={handleGoogleSignIn}
+              disabled={isLoading}
+              className="w-full font-semibold border border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-900 rounded-xl py-2.5 flex items-center justify-center gap-2 disabled:opacity-60"
+            >
+              {isLoading ? (
+                <>
+                  <Spinner size="sm" />
+                  <span className="text-gray-700 dark:text-gray-300">Redirecting...</span>
+                </>
+              ) : (
+                <>
+                  <FaGoogle className="text-red-500" />
+                  <span className="text-gray-700 dark:text-gray-300">Sign Up with Google</span>
+                </>
+              )}
+            </Button>
+            <p className="text-[11px] text-gray-400 text-center -mt-1">
+              Signing up with Google will create a Job Seeker account by default.
+            </p>
+          </div>
         </Card.Content>
 
         <Card.Footer className="justify-center pb-8 px-8">
@@ -147,7 +239,6 @@ export default function SignUpPage() {
             </Link>
           </p>
         </Card.Footer>
-
       </Card>
     </div>
   );

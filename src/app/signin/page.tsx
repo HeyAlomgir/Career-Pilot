@@ -1,15 +1,34 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession, signIn, signUp } from "@/lib/auth-client";
-import { Card, Input, Button, Separator, Spinner } from "@heroui/react";
+import { Card, Button, Separator, Spinner } from "@heroui/react";
 import { FaGoogle, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 
+
 export default function SignInPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex flex-1 items-center justify-center min-h-[75vh]">
+          <Spinner size="lg" />
+        </div>
+      }
+    >
+      <SignInForm />
+    </Suspense>
+  );
+}
+
+function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session, isPending: sessionLoading } = useSession();
+
+
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,21 +37,33 @@ export default function SignInPage() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (session) router.push("/dashboard");
-  }, [session, router]);
+    if (session) router.push(redirectTo);
+  }, [session, router, redirectTo]);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) { setError("Please fill in all fields."); return; }
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
     setIsLoading(true);
     setError("");
     try {
-      await signIn.email({ email, password, callbackURL: "/dashboard" }, {
-        onError: (ctx) => { setError(ctx.error.message || "Invalid email or password."); setIsLoading(false); },
-        onSuccess: () => { router.push("/dashboard"); router.refresh(); },
-      });
+      await signIn.email(
+        { email, password, callbackURL: redirectTo },
+        {
+          onError: (ctx) => {
+            setError(ctx.error.message || "Invalid email or password.");
+            setIsLoading(false);
+          },
+          onSuccess: () => {
+            router.push(redirectTo);
+            router.refresh();
+          },
+        }
+      );
     } catch (err: any) {
       setError(err?.message || "An unexpected error occurred.");
       setIsLoading(false);
@@ -45,21 +76,43 @@ export default function SignInPage() {
     const demoEmail = role === "Job Seeker" ? "seeker@demo.com" : "employer@demo.com";
     const demoPassword = "DemoPassword123!";
     const demoName = role === "Job Seeker" ? "John Doe (Seeker Demo)" : "Jane Smith (Employer Demo)";
+
+    const demoRedirect = role === "Employer" ? "/dashboard" : "/dashboard/seeker";
+
     try {
-      await signIn.email({ email: demoEmail, password: demoPassword, callbackURL: "/dashboard" }, {
-        onError: async (ctx) => {
-          if (ctx.error.status === 400 || ctx.error.message?.toLowerCase().includes("credential") || ctx.error.message?.toLowerCase().includes("user")) {
-            await signUp.email({ email: demoEmail, password: demoPassword, name: demoName, role, callbackURL: "/dashboard" }, {
-              onError: (signUpCtx) => { setError(signUpCtx.error.message || "Failed to create demo user."); setIsLoading(false); },
-              onSuccess: () => { router.push("/dashboard"); router.refresh(); },
-            });
-          } else {
-            setError(ctx.error.message || "Demo login failed.");
-            setIsLoading(false);
-          }
-        },
-        onSuccess: () => { router.push("/dashboard"); router.refresh(); },
-      });
+      await signIn.email(
+        { email: demoEmail, password: demoPassword, callbackURL: demoRedirect },
+        {
+          onError: async (ctx) => {
+            if (
+              ctx.error.status === 400 ||
+              ctx.error.message?.toLowerCase().includes("credential") ||
+              ctx.error.message?.toLowerCase().includes("user")
+            ) {
+              await signUp.email(
+                { email: demoEmail, password: demoPassword, name: demoName, role, callbackURL: demoRedirect },
+                {
+                  onError: (signUpCtx) => {
+                    setError(signUpCtx.error.message || "Failed to create demo user.");
+                    setIsLoading(false);
+                  },
+                  onSuccess: () => {
+                    router.push(demoRedirect);
+                    router.refresh();
+                  },
+                }
+              );
+            } else {
+              setError(ctx.error.message || "Demo login failed.");
+              setIsLoading(false);
+            }
+          },
+          onSuccess: () => {
+            router.push(demoRedirect);
+            router.refresh();
+          },
+        }
+      );
     } catch (err: any) {
       setError(err?.message || "Demo login failed.");
       setIsLoading(false);
@@ -70,7 +123,7 @@ export default function SignInPage() {
     setIsLoading(true);
     setError("");
     try {
-      await signIn.social({ provider: "google", callbackURL: "/dashboard" });
+      await signIn.social({ provider: "google", callbackURL: redirectTo });
     } catch (err: any) {
       setError(err?.message || "Google sign-in failed.");
       setIsLoading(false);
