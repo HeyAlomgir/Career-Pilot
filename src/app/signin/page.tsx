@@ -165,10 +165,20 @@ export default function SignInPage() {
             </div>
             <Button
               onPress={handleGoogleSignIn}
-              isPending={isLoading}
-              className="w-full font-semibold border border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-900 rounded-xl py-2.5 flex items-center justify-center gap-2"
+              disabled={isLoading}
+              className="w-full font-semibold border border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-900 rounded-xl py-2.5 flex items-center justify-center gap-2 disabled:opacity-60"
             >
-              <FaGoogle className="text-red-500" /> Sign In with Google
+              {isLoading ? (
+                <>
+                  <Spinner size="sm" />
+                  <span className="text-gray-700 dark:text-gray-300">Redirecting...</span>
+                </>
+              ) : (
+                <>
+                  <FaGoogle className="text-red-500" />
+                  <span className="text-gray-700 dark:text-gray-300">Sign In with Google</span>
+                </>
+              )}
             </Button>
           </div>
 

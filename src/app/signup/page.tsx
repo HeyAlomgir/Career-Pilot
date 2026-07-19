@@ -147,6 +147,7 @@ export default function SignUpPage() {
             </Link>
           </p>
         </Card.Footer>
+
       </Card>
     </div>
   );
