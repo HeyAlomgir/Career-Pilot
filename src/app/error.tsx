@@ -46,8 +46,7 @@ export default function Error({ error, reset }: ErrorProps) {
 
                 {/* try again */}
                 <Button
-                    color="danger"
-                    variant="flat"
+                    variant="danger-soft"
                     radius="lg"
                     size="md"
                     className="mt-2 font-medium tracking-wide gap-2 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all duration-300"
