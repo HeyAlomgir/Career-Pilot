@@ -1,6 +1,12 @@
 "use client";
 
+import Categories from "@/components/Categories";
 import Hero from "@/components/HeroSection";
+import HowItWorks from "@/components/HowitWorks";
+import LatestJobs from "@/components/LatesJob";
+import Stats from "@/components/Stats";
+import Testimonials from "@/components/Testimonials";
+import WhyChooseUs from "@/components/Whychooseus";
 import React from "react";
 
 
@@ -10,6 +16,13 @@ export default function Home() {
       {/* Hero Section */}
 
       <Hero />
+      <LatestJobs />
+      <Categories />
+      <HowItWorks />
+      <Stats />
+      <WhyChooseUs />
+      <Testimonials />
+
 
 
     </div>
