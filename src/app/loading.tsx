@@ -15,8 +15,7 @@ export default function Loading(): React.JSX.Element {
                 {/* HeroUI Spinner */}
                 <Spinner
                     size="lg"
-                    color="secondary"
-                    className="scale-125"
+                    className="scale-125 text-secondary"
                 />
 
                 {/* Loading Text */}
