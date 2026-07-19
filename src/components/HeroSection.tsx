@@ -75,16 +75,16 @@ export default function Hero(): React.JSX.Element {
 
                     <div className="flex flex-col sm:flex-row gap-3">
                         <Link
-                            href="/jobs"
+                            href="/signup"
                             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-black text-sm font-semibold hover:opacity-90 transition-opacity"
                         >
-                            Browse Jobs <FiArrowRight size={16} />
+                            GET STARTED <FiArrowRight size={16} />
                         </Link>
                         <Link
-                            href="/dashboard/jobs/add"
+                            href="/dashboard/jobs"
                             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
                         >
-                            Post a Job
+                            Browse Jobs
                         </Link>
                     </div>
                 </motion.div>

@@ -23,7 +23,7 @@ export default function Testimonials(): React.JSX.Element {
             try {
                 const res = await fetch(`${BACKEND_URL}/api/reviews/latest?limit=4`);
                 const data = await res.json();
-                setReviews(Array.isArray(data) ? data : data.reviews || []);
+                setReviews(data.reviews || []);
             } catch (err) {
                 console.error("Error fetching testimonials:", err);
             } finally {

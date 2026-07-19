@@ -1,6 +1,8 @@
 "use client";
 
 import Categories from "@/components/Categories";
+import CTA from "@/components/CTA";
+import FAQ from "@/components/FAQ";
 import Hero from "@/components/HeroSection";
 import HowItWorks from "@/components/HowitWorks";
 import LatestJobs from "@/components/LatesJob";
@@ -22,6 +24,8 @@ export default function Home() {
       <Stats />
       <WhyChooseUs />
       <Testimonials />
+      <FAQ />
+      <CTA />
 
 
 

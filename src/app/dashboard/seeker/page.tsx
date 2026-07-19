@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "@/lib/auth-client";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { FiBriefcase, FiFileText, FiClock, FiCheckCircle } from "react-icons/fi";
+import RecommendedJobs from "@/components/RecommendedJobs";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
@@ -223,6 +224,7 @@ export default function DashboardOverviewPage(): React.JSX.Element {
                     </ResponsiveContainer>
                 )}
             </div>
+            <RecommendedJobs />
         </div>
     );
 }
