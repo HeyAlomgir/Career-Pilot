@@ -77,11 +77,11 @@ export default function Footer(): React.JSX.Element {
                         <ul className="flex flex-col gap-2 text-sm mb-4">
                             <li className="flex items-center gap-2 text-gray-400">
                                 <FiMail size={14} className="flex-shrink-0" />
-                                support@careerpilot.com
+                                alomgirhosssain71@gmail.com
                             </li>
                             <li className="flex items-center gap-2 text-gray-400">
                                 <FiPhone size={14} className="flex-shrink-0" />
-                                +880 1234-567890
+                                +880 1756135199
                             </li>
                             <li className="flex items-center gap-2 text-gray-400">
                                 <FiMapPin size={14} className="flex-shrink-0" />

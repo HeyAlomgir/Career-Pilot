@@ -1,36 +1,160 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CareerPilot 🚀
 
-## Getting Started
+**AI-Powered Job & Freelance Marketplace** — connecting job seekers with employers through intelligent, AI-driven job matching, resume insight, and a smart conversational assistant.
 
-First, run the development server:
+Built as a full-stack Agentic AI application demonstrating modern web development, secure authentication, role-based authorization, and practical LLM integration.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 🔗 Live Links
+
+| | Link |
+|---|---|
+| **Live Website** | [https://your-live-url.vercel.app](#) |
+| **Frontend Repository** | [GitHub — Frontend](#) |
+| **Backend Repository** | [GitHub — Backend](#) |
+
+---
+
+## 🧠 AI Features
+
+CareerPilot implements two substantial Agentic AI features:
+
+1. **AI Chat Assistant** — A context-aware conversational assistant that understands the platform, helps users navigate features, and maintains conversation history with a typing indicator and suggested prompts.
+2. **AI Smart Recommendation Engine** — Analyzes a job seeker's application history to recommend the most relevant open jobs, improving with each new application.
+
+Both features are powered by the **Groq API** (Llama 3.3 70B).
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+- **Next.js** (App Router) + **TypeScript**
+- **Tailwind CSS** + **HeroUI** component library
+- **Better Auth** (email/password, Google OAuth, role-based access)
+- **Recharts** for dashboard analytics
+- **Framer Motion** for animations
+- **React Hot Toast** for notifications
+
+### Backend
+- **Node.js** + **Express** + **TypeScript**
+- **MongoDB** (native driver)
+- Role-based middleware authorization
+
+### AI Integration
+- **Groq API** (Llama 3.3 70B Versatile)
+
+### Other Services
+- **imgbb** — image hosting for job images and profile avatars
+
+---
+
+## ✨ Core Features
+
+- 🔐 Authentication: Email/Password, Google OAuth, Demo Login (auto-fill), role-based (Job Seeker / Employer)
+- 🧭 Role-based dashboards with sidebar navigation and analytics (Recharts)
+- 💼 Job listing with search, category & location filters, sorting, and pagination
+- 📄 Job details page with bookmarking and a review/rating system
+- 📝 Post, manage, and delete job listings (Employer)
+- 📨 Apply to jobs with a structured application form (Job Seeker)
+- ✅ Accept / Reject applicants (Employer)
+- 📊 My Applications tracker with status badges (Job Seeker)
+- 🌗 Dark / Light mode
+- 💬 Floating AI Chat Assistant available site-wide
+- 🎯 AI-powered job recommendations on the seeker dashboard
+- 📱 Fully responsive across mobile, tablet, and desktop
+
+---
+
+## 📁 Project Structure
+
+```
+career-pilot-client/        # Frontend (Next.js)
+├── src/
+│   ├── app/                # Pages (App Router)
+│   ├── components/         # Reusable UI components
+│   └── lib/                # Auth client, utilities
+└── ...
+
+career-pilot-server/         # Backend (Express)
+├── server.ts                # All routes and server entry point
+└── ...
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ⚙️ Getting Started (Local Setup)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Prerequisites
+- Node.js 18+
+- MongoDB Atlas account
+- Groq API key ([console.groq.com](https://console.groq.com))
+- imgbb API key ([api.imgbb.com](https://api.imgbb.com))
+- Google OAuth credentials ([console.cloud.google.com](https://console.cloud.google.com))
 
-## Learn More
+### 1. Clone the repositories
+```bash
+git clone <frontend-repo-url> career-pilot-client
+git clone <backend-repo-url> career-pilot-server
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Backend Setup
+```bash
+cd career-pilot-server
+npm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Create a `.env` file:
+```dotenv
+PORT=5000
+MONGODB_URI=your_mongodb_atlas_connection_string
+FRONTEND_URL=http://localhost:3000
+GROQ_API_KEY=your_groq_api_key
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Run the backend:
+```bash
+npm run dev
+```
 
-## Deploy on Vercel
+### 3. Frontend Setup
+```bash
+cd career-pilot-client
+npm install
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Create a `.env.local` file:
+```dotenv
+MONGODB_URI=your_mongodb_atlas_connection_string
+BETTER_AUTH_SECRET=your_random_secret
+NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_BACKEND_URL=http://localhost:5000
+NEXT_PUBLIC_IMGBB_API_KEY=your_imgbb_api_key
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Run the frontend:
+```bash
+npm run dev
+```
+
+Visit `http://localhost:3000`.
+
+---
+
+## 🔑 Demo Login
+
+The Sign In page includes one-click demo login buttons for course evaluators:
+
+| Role | Access |
+|---|---|
+| **Job Seeker Demo** | Browse jobs, apply, bookmark, review, view AI recommendations |
+| **Employer Demo** | Post jobs, manage listings, review applicants |
+
+---
+
+## 👤 Author
+
+Built by **Alomgir Hossain** as part of the SCIC-13 Agentic AI Full Stack Project assignment.
